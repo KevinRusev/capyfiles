@@ -4,7 +4,7 @@
 
 # Capy Files
 
-**59 file and AI tools that run in your browser. Your files never leave your device.**
+**61 file and AI tools that run in your browser. Your files never leave your device.**
 
 [![Live](https://img.shields.io/badge/Live_at-capyfiles.com-1d64c8?style=for-the-badge)](https://capyfiles.com)
 [![Status](https://img.shields.io/badge/Status-In_Production-3fb950?style=for-the-badge)](https://capyfiles.com)
@@ -82,15 +82,15 @@ with WebAssembly, WebCodecs and on-device AI models:
 
 ## Tools
 
-59 released tools in seven categories (counted from the production tool registry):
+61 released tools in seven categories (counted from the production tool registry):
 
 | Category | Tools | Examples |
 | --- | ---: | --- |
-| PDF | 25 | Compress, merge, split, organise, edit, sign, redact, compare, protect / unlock, PDF/A, scan to PDF |
+| PDF | 26 | Compress, merge, split, organise, edit, sign, redact, compare, protect / unlock, PDF/A, scan to PDF |
 | Images | 11 | Compress, convert, HEIC to JPG, resize, crop, remove metadata, image to SVG, photo editor, face blur |
 | Video | 7 | Compress, convert, trim, video to GIF, extract audio, mute, screen recorder |
 | Audio | 4 | Compress, convert, trim, voice recorder |
-| AI | 4 | Background removal, 4× upscaling, OCR, transcription |
+| AI | 5 | Background removal, 4× upscaling, OCR, transcription, hide personal details before pasting text into an AI chat |
 | Design | 6 | Palette from image, contrast checker, QR codes, colour converter, gradients, device mockups |
 | Files | 2 | Zip, unzip |
 
