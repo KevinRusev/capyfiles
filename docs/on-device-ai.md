@@ -7,7 +7,7 @@ model comes to the data, not the other way round.
 
 | Feature | Model | Licence | Why this one |
 | --- | --- | --- | --- |
-| Background removal | **BiRefNet Lite** (512×512) | MIT | Sharp edges on hair and products, and a licence that allows commercial use. It replaced a popular model whose licence doesn't |
+| Background removal | **BiRefNet** (Lite 512 and 1024, full 1024 in fp16) | MIT | Sharp edges on hair and products, and a licence that allows commercial use. It replaced a popular model whose licence doesn't |
 | 4× upscaling | **RealPLKSR** | MIT | Good detail on photos at a size a laptop GPU handles; images are processed in overlapping tiles |
 | Face blur | **YuNet** | MIT | Tiny, fast face detector, run on overlapping tiles so small faces in big photos are found; the blur is applied locally |
 | Transcription | **Whisper** base, small, large-v3 turbo | Apache-2.0 / MIT | Multilingual speech-to-text with automatic language detection |

@@ -41,17 +41,19 @@ nothing about the files people work on.
   - **Model delivery** from R2 object storage with correct content types, range requests (so downloads can resume) and
     immutable caching.
   - **A small JSON API** for accounts and subscriptions, with schema validation, rate limiting and origin checks.
-  - **Payment webhooks** from Paddle, verified by signature, processed idempotently and in order.
+  - **Payment webhooks** from Stripe, verified by signature, processed idempotently and in order; refunds, disputes
+    and withdrawals update the plan the same way.
   - **Scheduled jobs** for renewal reminders, claimed before sending so a retry never sends twice.
 - **D1** (SQLite at the edge) stores accounts, subscription state and legally required records. It holds nothing
   derived from user files.
 
 ### 4. Accounts and payments
 
-- **Firebase Authentication** (Google, or a one-time email link; no passwords). The Worker verifies sign-in tokens
+- **Firebase Authentication** (Google, Microsoft, GitHub, or a one-time email link; no passwords). The Worker verifies sign-in tokens
   itself on every request.
-- **Paddle** is the merchant of record: it handles checkout, VAT and invoices. Subscription state reaches the app only
-  through verified webhooks.
+- **Stripe Managed Payments** (Link is the merchant of record) handles VAT, receipts and invoices. Checkout is
+  embedded in the site and only exists once the buyer has ticked both consent boxes. Subscription state reaches the
+  app only through verified webhooks, and the browser receives it as a signed entitlement it verifies itself.
 - The free tools never require an account, and the sign-in code is only loaded for people who sign in.
 
 ## Security headers and cross-origin isolation
@@ -83,7 +85,7 @@ Every build runs, in order:
 
 1. TypeScript strict type checks (app and Worker).
 2. Lint (correctness and React hook rules are errors).
-3. **276 unit tests** (header policy, webhooks and signatures, entitlement rules, model delivery, PDF internals,
+3. **900+ unit tests** (header policy, webhooks and signatures, entitlement rules, model delivery, PDF internals,
    resumable downloads, SEO rules and more).
 4. Production build and pre-render of every page.
 5. **Licence compliance check**: every shipped dependency and AI model is checked against an allowlist. GPL, AGPL,

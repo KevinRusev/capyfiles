@@ -30,9 +30,12 @@ with WebAssembly, WebCodecs and on-device AI models:
 
 - **Private by construction.** Files, file names and results never leave the device. There is no upload step to secure
   because there is no upload.
-- **No waiting on a server.** No upload or download time, no queue, no file-size limit set by someone else's bandwidth.
-- **Works offline.** It installs as a PWA; once a tool has been used, it keeps working without a connection.
-- **No cookies, no trackers.**
+- **No waiting on a server.** No upload or download time and no queue.
+- **Works offline.** It installs as a PWA; after one visit the whole app, including its engines, works without a
+  connection. (AI models download once, the first time an AI tool is used.)
+- **No ads, no trackers, no analytics.**
+- **Free, with an optional Pro.** Every free tool needs no account and adds no watermark. Pro (weekly, monthly, yearly
+  or a capped lifetime launch deal) unlocks the best AI quality, big batches, the PDF editor and Workflows.
 
 ## Screenshots
 
@@ -42,11 +45,11 @@ with WebAssembly, WebCodecs and on-device AI models:
   <tr>
     <td align="center" width="50%">
       <img src="screenshots/desktop/01-home.png" alt="Home page" /><br/>
-      <sub><b>Home: search, popular tools, every category</b></sub>
+      <sub><b>Home: pick any file, see which tools open it</b></sub>
     </td>
     <td align="center" width="50%">
       <img src="screenshots/desktop/02-pdf-tools.png" alt="PDF tools" /><br/>
-      <sub><b>Tool catalogue: 25 PDF tools</b></sub>
+      <sub><b>Tool catalogue: 26 PDF tools</b></sub>
     </td>
   </tr>
   <tr>
@@ -69,6 +72,12 @@ with WebAssembly, WebCodecs and on-device AI models:
       <sub><b>Image conversion: HEIC, JPG, PNG, WebP, AVIF, JPEG XL</b></sub>
     </td>
   </tr>
+  <tr>
+    <td align="center" colspan="2">
+      <img src="screenshots/desktop/08-pricing.png" alt="Pricing" width="70%" /><br/>
+      <sub><b>Pricing: week pass, Pro monthly or yearly, and a capped lifetime launch deal</b></sub>
+    </td>
+  </tr>
 </table>
 
 <table>
@@ -77,6 +86,7 @@ with WebAssembly, WebCodecs and on-device AI models:
     <td align="center"><img src="screenshots/mobile/03-ai-tools.png" alt="AI tools on mobile" width="200" /><br/><sub><b>AI tools</b></sub></td>
     <td align="center"><img src="screenshots/mobile/04-compress-pdf.png" alt="Compress PDF on mobile" width="200" /><br/><sub><b>Compress PDF</b></sub></td>
     <td align="center"><img src="screenshots/mobile/06-transcribe.png" alt="Transcribe on mobile" width="200" /><br/><sub><b>Transcribe</b></sub></td>
+    <td align="center"><img src="screenshots/mobile/08-pricing.png" alt="Pricing on mobile" width="200" /><br/><sub><b>Pricing</b></sub></td>
   </tr>
 </table>
 
@@ -98,7 +108,7 @@ with WebAssembly, WebCodecs and on-device AI models:
 
 - **AI on the device.** Models run through Transformers.js and ONNX Runtime Web on **WebGPU** (half precision where the GPU
   supports it), with an automatic **WebAssembly CPU fallback**:
-  - **BiRefNet Lite** for background removal
+  - **BiRefNet** for background removal, in three quality levels (Lite at 512 and 1024 px, full model at 1024 px)
   - **RealPLKSR** for 4× super-resolution
   - **YuNet** for face detection (face blur)
   - **Whisper** (base, small, large-v3 turbo) for transcription
@@ -107,16 +117,25 @@ with WebAssembly, WebCodecs and on-device AI models:
   It also includes a **custom PDF compressor** written to replace AGPL-licensed Ghostscript.
 - **Edge hosting.** Cloudflare Workers serve the app and the API, with D1 as the database and R2 for model files. Large
   model downloads are **resumable**: a dropped connection continues from the last byte instead of starting over.
-- **Offline, installable PWA.** A service worker caches the app shell and the engines a tool has already used.
+- **Offline, installable PWA.** A service worker saves the app shell and the everyday engines (image codecs, qpdf,
+  HEIC, AAC) on the first visit; an end-to-end suite runs every tool test with the network switched off.
 - **SEO without a server renderer.** Every public page is **pre-rendered to static HTML at build time** (titles, canonical
   links, Open Graph, JSON-LD, sitemap). React takes over in the browser.
-- **Payments and accounts.** Paddle subscriptions as merchant of record, with **signature-verified, idempotent
-  webhooks**, Firebase Authentication (Google and email link), and scheduled renewal-reminder emails.
+- **Payments and accounts.**
+  - **Stripe Managed Payments** (Link as merchant of record, handling VAT worldwide) with an **embedded checkout**:
+    card, Apple Pay, Google Pay, Link and local methods, styled to the site.
+  - **Signature-verified, idempotent webhooks**; plans are delivered as signed entitlements the browser verifies.
+  - **EU consumer law built in:** two-box consent before the form exists, one-click withdrawal with a **proportionate
+    refund** (price minus the days used), renewal reminders, and a Bulgarian-language contract for local buyers.
+  - **Firebase Authentication:** Google, Microsoft, GitHub and email link, with Sign in with Apple ready behind a flag.
 - **Security and quality.**
   - Strict Content Security Policy, HSTS and a locked-down Permissions-Policy.
   - **Cross-origin isolation only on pages that need it.**
   - TypeScript strict with no `any`.
-  - **276 unit tests**, and CI runs typecheck, lint, tests and build.
+  - **900+ unit tests**, and CI runs typecheck, lint, tests and build.
+  - **Playwright end-to-end tests** in Chromium and WebKit: every tool, checkout on 14 screen sizes from a 360 px phone
+    to 4K, accessibility checks, and offline runs.
+  - **Performance budget:** every page loads under 200 KB of gzipped JavaScript up front; the rest loads on use.
   - An **automated licence compliance check** fails the build on GPL, AGPL or non-commercial dependencies and models.
 
 ## Architecture
@@ -142,8 +161,8 @@ flowchart LR
   UI <-- "pages and app code" --> W
   GPU <-- "model weights, resumable" --> W
   UI <-- "sign-in" --> FB["Firebase Auth"]
-  UI <-- "checkout" --> PD["Paddle"]
-  PD -- "signed webhooks" --> W
+  UI <-- "embedded checkout" --> ST["Stripe<br/>(Link, merchant of record)"]
+  ST -- "signed webhooks" --> W
 ```
 
 Files never travel on any of these arrows. The network carries the app itself, the AI model weights (downloaded once
@@ -158,9 +177,9 @@ and cached), and, for paying users, account and subscription state. More in
 | Processing | WebAssembly (qpdf, MozJPEG, OxiPNG, Tesseract), pdf.js, pdf-lib, WebCodecs, Web Workers |
 | AI | Transformers.js, ONNX Runtime Web, WebGPU, WASM SIMD + threads |
 | Hosting | Cloudflare Workers, D1, R2, rate limiting, cron triggers |
-| Accounts and billing | Firebase Authentication, Paddle (merchant of record), transactional email |
+| Accounts and billing | Firebase Authentication, Stripe Managed Payments (embedded checkout), transactional email |
 | Offline | Service worker (Workbox), installable PWA |
-| Quality | Vitest, oxlint, GitHub Actions, licence compliance check, pre-render on every build |
+| Quality | Vitest, Playwright (Chromium + WebKit), oxlint, GitHub Actions, licence compliance check, JS budget |
 
 ## What I built
 
