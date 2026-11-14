@@ -33,7 +33,8 @@ with WebAssembly, WebCodecs and on-device AI models:
 - **No waiting on a server.** No upload or download time and no queue.
 - **Works offline.** It installs as a PWA; after one visit the whole app, including its engines, works without a
   connection. (AI models download once, the first time an AI tool is used.)
-- **No ads, no trackers, no analytics.**
+- **No ads and no third-party trackers or analytics scripts.** Usage is counted as cookieless totals on Capy Files' own
+  server (which tools are opened and finished, and which channel a visit came from), never anything about the files.
 - **Free, with an optional Pro.** Every free tool needs no account and adds no watermark. Pro (weekly, monthly, yearly
   or a capped lifetime launch deal) unlocks the best AI quality, big batches, the PDF editor and Workflows.
 
@@ -132,7 +133,7 @@ with WebAssembly, WebCodecs and on-device AI models:
   - Strict Content Security Policy, HSTS and a locked-down Permissions-Policy.
   - **Cross-origin isolation only on pages that need it.**
   - TypeScript strict with no `any`.
-  - **900+ unit tests**, and CI runs typecheck, lint, tests and build.
+  - **Almost 1,000 unit tests**, and CI runs typecheck, lint, tests and build.
   - **Playwright end-to-end tests** in Chromium and WebKit: every tool, checkout on 14 screen sizes from a 360 px phone
     to 4K, accessibility checks, and offline runs.
   - **Performance budget:** every page loads under 200 KB of gzipped JavaScript up front; the rest loads on use.
