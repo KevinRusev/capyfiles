@@ -5,15 +5,15 @@ A high-level tour of how Capy Files is put together. Internal names, paths and c
 ## Guiding rule
 
 **File content never leaves the device.** Every design decision follows from that: processing happens in the browser,
-the server only delivers the app and AI models, and the few things it stores (accounts and subscription state) contain
-nothing about the files people work on.
+the server only delivers the app and AI models, and the few things it stores (accounts, subscription state and a few
+cookieless counters) contain nothing about the files people work on.
 
 ## The pieces
 
 ### 1. The app (browser)
 
 - **React 19 + TypeScript + Vite**, styled with Tailwind CSS. Each tool is its own lazily loaded chunk, so opening one
-  tool doesn't download the other 58.
+  tool doesn't download the other 60.
 - **One tool registry** describes every tool: name, category, accepted file types, limits, and whether it's released.
   Navigation, search, routing, the sitemap and the SEO metadata are all generated from it, so they cannot drift apart.
 - **Heavy work runs in Web Workers**, off the main thread: PDF rewriting, image encoding, video transcoding, AI
@@ -44,6 +44,9 @@ nothing about the files people work on.
   - **Payment webhooks** from Stripe, verified by signature, processed idempotently and in order; refunds, disputes
     and withdrawals update the plan the same way.
   - **Scheduled jobs** for renewal reminders, claimed before sending so a retry never sends twice.
+  - **Cookieless usage counts** in Workers Analytics Engine: which tools are opened and finished, where a visit came
+    from (one word from a fixed list), and checkout steps. No cookies, no third-party analytics script, no identifiers,
+    nothing about files. A public count of finished jobs is capped per network so a script can't inflate it.
 - **D1** (SQLite at the edge) stores accounts, subscription state and legally required records. It holds nothing
   derived from user files.
 
@@ -85,7 +88,7 @@ Every build runs, in order:
 
 1. TypeScript strict type checks (app and Worker).
 2. Lint (correctness and React hook rules are errors).
-3. **900+ unit tests** (header policy, webhooks and signatures, entitlement rules, model delivery, PDF internals,
+3. **Almost 1,000 unit tests** (header policy, webhooks and signatures, entitlement rules, model delivery, PDF internals,
    resumable downloads, SEO rules and more).
 4. Production build and pre-render of every page.
 5. **Licence compliance check**: every shipped dependency and AI model is checked against an allowlist. GPL, AGPL,
